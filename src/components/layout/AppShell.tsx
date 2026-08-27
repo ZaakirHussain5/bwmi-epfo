@@ -10,6 +10,7 @@ import { BottomNav } from "./BottomNav";
 import { NidhiLogo } from "./NidhiLogo";
 import { SidebarToggle } from "./SidebarToggle";
 import { ThemeToggle } from "./ThemeToggle";
+import { PrivacyToggle } from "./PrivacyToggle";
 import { TopNav } from "./TopNav";
 import { NAV_ITEMS } from "./nav-config";
 import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
@@ -56,6 +57,7 @@ export function AppShell({ children }: PropsWithChildren) {
           <div className="ml-auto flex items-center justify-end gap-2 md:ml-0 md:gap-3 md:justify-self-end">
             <LanguageSwitcher compact />
             <ThemeToggle />
+            <PrivacyToggle />
             <form action={signOutMemberAccount}>
               <button
                 type="submit"

@@ -4,12 +4,18 @@ function intlLocale(locale: AppLocale = "en") {
   return LOCALE_META[locale].intl;
 }
 
-export const formatCurrency = (value: number, locale: AppLocale = "en") =>
-  new Intl.NumberFormat(intlLocale(locale), {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
+export const formatCurrency = (
+  value: number,
+  locale: AppLocale = "en",
+  hidden = false,
+) =>
+  hidden
+    ? "XXX"
+    : new Intl.NumberFormat(intlLocale(locale), {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      }).format(value);
 
 export const formatDate = (value: string, locale: AppLocale = "en") =>
   new Date(value).toLocaleDateString(intlLocale(locale), {

@@ -9,6 +9,7 @@ import { interpolate } from "@/i18n/config";
 import { useLocale } from "@/i18n/useLocale";
 import { NIDHI_REFRESH_EVENT } from "@/lib/events";
 import { formatCurrency, formatDateTime } from "@/lib/utils/format";
+import { usePrivacyMode } from "@/hooks/usePrivacyMode";
 import type {
   AccountHealthReport,
   Claim,
@@ -102,6 +103,7 @@ export function ClaimsWorkspace({
   resumeDraftId,
 }: ClaimsWorkspaceProps) {
   const { locale, t } = useLocale();
+  const { hidden: hideSensitiveValues } = usePrivacyMode();
   const flowStepperSteps = flowStepperKeys.map((key) => ({
     key,
     label: t.claims.steps[key].label,
@@ -472,7 +474,7 @@ export function ClaimsWorkspace({
                   className="flex items-center justify-between rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900/60"
                 >
                   <p className="text-sm text-zinc-700 dark:text-zinc-200">
-                    {claim.referenceNumber} - {formatCurrency(claim.amount, locale)}
+                    {claim.referenceNumber} - {formatCurrency(claim.amount, locale, hideSensitiveValues)}
                   </p>
                   <button
                     type="button"
@@ -847,7 +849,7 @@ export function ClaimsWorkspace({
                       <strong>{t.claims.bankVerification}</strong> {t.claims.bankState[form.bankVerificationState]}
                     </p>
                     <p>
-                      <strong>{t.claims.amount}</strong> {formatCurrency(form.amount, locale)}
+                      <strong>{t.claims.amount}</strong> {formatCurrency(form.amount, locale, hideSensitiveValues)}
                     </p>
                     <p>
                       <strong>{t.claims.purpose}</strong>{" "}

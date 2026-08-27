@@ -8,6 +8,7 @@ import { buildYears, monthLabel, monthlyTotal, percentChange } from "@/features/
 import { interpolate } from "@/i18n/config";
 import { useLocale } from "@/i18n/useLocale";
 import { formatCurrency } from "@/lib/utils/format";
+import { usePrivacyMode } from "@/hooks/usePrivacyMode";
 import type { PassbookEntry } from "@/types/epf";
 
 interface PassbookExplorerProps {
@@ -16,6 +17,7 @@ interface PassbookExplorerProps {
 
 export function PassbookExplorer({ entries }: PassbookExplorerProps) {
   const { locale, t } = useLocale();
+  const { hidden: hideSensitiveValues } = usePrivacyMode();
   const [query, setQuery] = useState("");
   const [year, setYear] = useState<string>("all");
   const [compareMonth, setCompareMonth] = useState<string>("");
@@ -140,29 +142,29 @@ export function PassbookExplorer({ entries }: PassbookExplorerProps) {
         <div className="grid gap-2 md:grid-cols-3">
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.employee}</p>
-            <p className="font-semibold">{formatCurrency(totals.employee, locale)}</p>
+            <p className="font-semibold">{formatCurrency(totals.employee, locale, hideSensitiveValues)}</p>
           </div>
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.employer}</p>
-            <p className="font-semibold">{formatCurrency(totals.employer, locale)}</p>
+            <p className="font-semibold">{formatCurrency(totals.employer, locale, hideSensitiveValues)}</p>
           </div>
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.interest}</p>
-            <p className="font-semibold">{formatCurrency(totals.interest, locale)}</p>
+            <p className="font-semibold">{formatCurrency(totals.interest, locale, hideSensitiveValues)}</p>
           </div>
         </div>
         <div className="grid gap-2 md:grid-cols-3">
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.eps}</p>
-            <p className="font-semibold">{formatCurrency(totals.eps, locale)}</p>
+            <p className="font-semibold">{formatCurrency(totals.eps, locale, hideSensitiveValues)}</p>
           </div>
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.transfers}</p>
-            <p className="font-semibold">{formatCurrency(totals.transferIn, locale)}</p>
+            <p className="font-semibold">{formatCurrency(totals.transferIn, locale, hideSensitiveValues)}</p>
           </div>
           <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900/60">
             <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.currentBalance}</p>
-            <p className="font-semibold">{formatCurrency(currentBalance, locale)}</p>
+            <p className="font-semibold">{formatCurrency(currentBalance, locale, hideSensitiveValues)}</p>
           </div>
         </div>
       </header>
@@ -203,8 +205,8 @@ export function PassbookExplorer({ entries }: PassbookExplorerProps) {
 
         {compareResult ? (
           <p className="mt-3 rounded-xl bg-teal-50 px-3 py-2 text-sm text-teal-900 dark:bg-teal-950/40 dark:text-teal-200">
-            {compareResult.latestMonth} ({formatCurrency(compareResult.latestTotal, locale)}) vs{" "}
-            {compareResult.selectedMonth} ({formatCurrency(compareResult.selectedTotal, locale)}):{" "}
+            {compareResult.latestMonth} ({formatCurrency(compareResult.latestTotal, locale, hideSensitiveValues)}) vs{" "}
+            {compareResult.selectedMonth} ({formatCurrency(compareResult.selectedTotal, locale, hideSensitiveValues)}):{" "}
             <strong>
               {compareResult.delta >= 0 ? "+" : ""}
               {compareResult.delta.toFixed(1)}%
@@ -239,7 +241,7 @@ export function PassbookExplorer({ entries }: PassbookExplorerProps) {
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">{monthLabel(entry.wageMonth, locale)}</p>
-                  <p className="text-lg font-semibold">{formatCurrency(total, locale)}</p>
+                  <p className="text-lg font-semibold">{formatCurrency(total, locale, hideSensitiveValues)}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {t.passbook.employer}: {entry.employerName ?? t.passbook.mappedEmployer}
                   </p>
@@ -247,20 +249,20 @@ export function PassbookExplorer({ entries }: PassbookExplorerProps) {
                 <div className="grid grid-cols-2 gap-3 text-xs md:grid-cols-4 md:text-sm">
                   <div>
                     <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.employee}</p>
-                    <p className="font-medium">{formatCurrency(entry.employeeContribution, locale)}</p>
+                    <p className="font-medium">{formatCurrency(entry.employeeContribution, locale, hideSensitiveValues)}</p>
                   </div>
                   <div>
                     <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.employer}</p>
-                    <p className="font-medium">{formatCurrency(entry.employerContribution, locale)}</p>
+                    <p className="font-medium">{formatCurrency(entry.employerContribution, locale, hideSensitiveValues)}</p>
                   </div>
                   <div>
                     <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.interest}</p>
-                    <p className="font-medium">{formatCurrency(entry.interestCredit, locale)}</p>
+                    <p className="font-medium">{formatCurrency(entry.interestCredit, locale, hideSensitiveValues)}</p>
                   </div>
                   <div>
                     <p className="text-zinc-500 dark:text-zinc-400">{t.passbook.transferAdj}</p>
                     <p className="font-medium">
-                      {formatCurrency((entry.transferIn ?? 0) + (entry.adjustment ?? 0), locale)}
+                      {formatCurrency((entry.transferIn ?? 0) + (entry.adjustment ?? 0), locale, hideSensitiveValues)}
                     </p>
                   </div>
                 </div>

@@ -35,6 +35,10 @@ export const hi: AppMessages = {
     toLight: "लाइट मोड पर जाएँ",
     toDark: "डार्क मोड पर जाएँ",
   },
+  privacy: {
+    show: "संवेदनशील आंकड़े दिखाएँ",
+    hide: "संवेदनशील आंकड़े छिपाएँ",
+  },
   status: {
     action_required: "कार्रवाई जरूरी",
     important: "महत्वपूर्ण",

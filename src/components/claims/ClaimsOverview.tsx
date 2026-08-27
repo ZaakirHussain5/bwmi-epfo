@@ -9,6 +9,7 @@ import { claimStageLabel, claimStatusLabel, claimStatusTone, claimTypeLabel } fr
 import { interpolate } from "@/i18n/config";
 import { useLocale } from "@/i18n/useLocale";
 import { formatCurrency, formatDateTime, formatRelativeTime } from "@/lib/utils/format";
+import { usePrivacyMode } from "@/hooks/usePrivacyMode";
 import type { Claim } from "@/types/epf";
 
 interface ClaimsOverviewProps {
@@ -59,6 +60,7 @@ function ClaimTimeline({ claim }: { claim: Claim }) {
 
 export function ClaimsOverview({ claims }: ClaimsOverviewProps) {
   const { locale, t } = useLocale();
+  const { hidden: hideSensitiveValues } = usePrivacyMode();
   const active = claims.filter((claim) => claim.status === "active");
   const drafts = claims.filter((claim) => claim.status === "draft");
   const completed = claims.filter((claim) => claim.status === "completed");
@@ -178,7 +180,7 @@ export function ClaimsOverview({ claims }: ClaimsOverviewProps) {
                       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                         {interpolate(t.claims.refAmount, {
                           ref: claim.referenceNumber,
-                          amount: formatCurrency(claim.amount, locale),
+                          amount: formatCurrency(claim.amount, locale, hideSensitiveValues),
                         })}
                       </p>
                       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
