@@ -1,0 +1,313 @@
+.landing-root {
+  --landing-tilt-x: 0deg;
+  --landing-tilt-y: 0deg;
+}
+
+.landing-root[data-landing-lang="hi"] {
+  font-family: var(--font-devanagari), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.landing-root[data-landing-lang="kn"] {
+  font-family: var(--font-kannada), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.landing-mesh {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(20, 184, 166, 0.22), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 20%, rgba(251, 191, 36, 0.12), transparent 50%),
+    linear-gradient(rgba(15, 118, 110, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 118, 110, 0.08) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+}
+
+.dark .landing-mesh {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(45, 212, 191, 0.18), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 20%, rgba(251, 191, 36, 0.1), transparent 50%),
+    linear-gradient(rgba(45, 212, 191, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.07) 1px, transparent 1px);
+}
+
+.landing-stage {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  perspective: 1400px;
+}
+
+.landing-world {
+  position: absolute;
+  inset: 8% 6% 4%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 180ms ease-out;
+}
+
+.landing-gyro {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 22rem;
+  height: 22rem;
+  transform: translate(-50%, -50%) rotateX(62deg);
+  transform-style: preserve-3d;
+}
+
+.landing-gyro-ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(20, 184, 166, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 0 24px rgba(45, 212, 191, 0.18);
+}
+
+.landing-gyro-ring-x {
+  animation: landing-spin-x 14s linear infinite;
+}
+
+.landing-gyro-ring-y {
+  transform: rotateY(70deg);
+  animation: landing-spin-y 18s linear infinite;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.landing-gyro-ring-z {
+  transform: rotateX(80deg);
+  animation: landing-spin-z 11s linear infinite;
+}
+
+.landing-device {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(17.5rem, 72%);
+  transform: translate(-50%, -50%) translateZ(48px) rotateX(8deg) rotateY(-12deg);
+  border-radius: 1.6rem;
+  padding: 1.4rem 1.3rem 1.6rem;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.92), rgba(15, 118, 110, 0.55));
+  box-shadow:
+    0 28px 50px rgba(15, 23, 42, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(153, 246, 228, 0.28);
+  transform-style: preserve-3d;
+}
+
+.landing-device-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 42%);
+  pointer-events: none;
+}
+
+.landing-float {
+  position: absolute;
+  width: 11.5rem;
+  border-radius: 1.1rem;
+  padding: 0.85rem 0.95rem;
+  background: color-mix(in oklab, var(--surface) 88%, white);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(12px);
+  animation: landing-float 5.5s ease-in-out infinite;
+}
+
+.landing-float-passbook {
+  left: 2%;
+  top: 14%;
+  transform: translateZ(90px) rotateY(18deg);
+  animation-delay: -1.2s;
+}
+
+.landing-float-claim {
+  right: 0;
+  top: 18%;
+  left: auto;
+  transform: translateZ(70px) rotateY(-16deg);
+  animation-delay: -2.4s;
+}
+
+.landing-float-chat {
+  left: 12%;
+  bottom: 8%;
+  transform: translateZ(110px) rotateX(6deg);
+  animation-delay: -0.6s;
+}
+
+.landing-coin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #fde68a, #d97706);
+  color: #78350f;
+  font-weight: 800;
+  box-shadow: 0 10px 18px rgba(146, 64, 14, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: landing-orbit-coin 10s linear infinite;
+}
+
+.landing-coin-a {
+  left: 18%;
+  top: 42%;
+}
+
+.landing-coin-b {
+  right: 16%;
+  top: 58%;
+  animation-duration: 13s;
+  animation-direction: reverse;
+}
+
+.landing-coin-c {
+  left: 46%;
+  bottom: 6%;
+  animation-duration: 16s;
+}
+
+.landing-orbit-a {
+  transform-origin: 320px 300px;
+  animation: landing-spin 28s linear infinite;
+}
+
+.landing-orbit-b {
+  transform-origin: 320px 300px;
+  animation: landing-spin 40s linear infinite reverse;
+}
+
+.landing-orbit-c {
+  transform-origin: 320px 300px;
+  animation: landing-spin 22s linear infinite;
+}
+
+.landing-node {
+  animation: landing-pulse-dot 2.8s ease-in-out infinite;
+}
+
+.landing-pulse {
+  border: 2px solid rgba(45, 212, 191, 0.7);
+  animation: landing-pulse-ring 2s ease-out infinite;
+}
+
+.landing-draw {
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: landing-draw 3.4s ease forwards infinite;
+}
+
+.landing-dash {
+  stroke-dashoffset: 0;
+  animation: landing-dash-move 12s linear infinite;
+}
+
+@keyframes landing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes landing-spin-x {
+  to {
+    transform: rotateX(360deg);
+  }
+}
+
+@keyframes landing-spin-y {
+  to {
+    transform: rotateY(430deg);
+  }
+}
+
+@keyframes landing-spin-z {
+  to {
+    transform: rotateX(80deg) rotateZ(360deg);
+  }
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes landing-orbit-coin {
+  0% {
+    transform: translate3d(0, 0, 40px) rotateY(0deg);
+  }
+  50% {
+    transform: translate3d(18px, -22px, 80px) rotateY(180deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 40px) rotateY(360deg);
+  }
+}
+
+@keyframes landing-pulse-dot {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes landing-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes landing-draw {
+  0% {
+    stroke-dashoffset: 220;
+  }
+  40%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes landing-dash-move {
+  to {
+    stroke-dashoffset: -180;
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-float-passbook,
+  .landing-float-claim {
+    display: none;
+  }
+
+  .landing-gyro {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-world,
+  .landing-gyro-ring,
+  .landing-float,
+  .landing-coin,
+  .landing-orbit-a,
+  .landing-orbit-b,
+  .landing-orbit-c,
+  .landing-node,
+  .landing-pulse,
+  .landing-draw,
+  .landing-dash {
+    animation: none !important;
+    transition: none !important;
+  }
+}

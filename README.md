@@ -2,23 +2,34 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+cp .env.example .env.local
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000), enter the portal, and use the left-rail **Ask Nidhi** assistant.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local`:
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | Server-only key for chat, tools, and voice | _(empty → local intent mode)_ |
+| `OPENAI_MODEL` | Text and voice inference model | `gpt-5.6` |
+| `OPENAI_TRANSCRIBE_MODEL` | Speech-to-text | `whisper-1` |
+| `OPENAI_TTS_MODEL` | Optional speech synthesis | `gpt-4o-mini-tts` |
+| `OPENAI_TTS_VOICE` | Optional TTS voice | `alloy` |
+
+Never prefix the API key with `NEXT_PUBLIC_`. Status is exposed by `GET /api/assistant/status` without leaking the key.
+
+```bash
+npm test
+npm run lint
+```
+
+See `docs/CODEX_USAGE.md` for assistant, claim, ticket, and voice examples.
 
 ## Learn More
 

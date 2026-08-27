@@ -1,0 +1,125 @@
+:root {
+  --ux4g-bg-neutral-subtle: #e4e4e7;
+  --ux4g-bg-primary-strong: #0f766e;
+  --ux4g-text-neutral-secondary: #334155;
+  --ux4g-text-neutral-tertiary: #64748b;
+  --ux4g-text-brand-primary-default: #0f766e;
+  --ux4g-text-status-success: #047857;
+  --ux4g-color-neutral-300: #94a3b8;
+  --ux4g-border-color-primary-strong: #0f766e;
+  --ux4g-inline-s: 0.5rem;
+}
+
+.dark {
+  --ux4g-bg-neutral-subtle: #334155;
+  --ux4g-bg-primary-strong: #14b8a6;
+  --ux4g-text-neutral-secondary: #e2e8f0;
+  --ux4g-text-neutral-tertiary: #94a3b8;
+  --ux4g-text-brand-primary-default: #2dd4bf;
+  --ux4g-text-status-success: #34d399;
+  --ux4g-color-neutral-300: #94a3b8;
+  --ux4g-border-color-primary-strong: #14b8a6;
+}
+
+.ux4g-stepper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--ux4g-inline-s);
+}
+
+.ux4g-stepper .ux4g-stepper-step {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ux4g-inline-s);
+  min-width: 8rem;
+}
+
+.ux4g-stepper .ux4g-stepper-step:last-child {
+  flex: 0;
+}
+
+.ux4g-stepper .ux4g-stepper-step:not(:last-child):after {
+  content: "";
+  position: absolute;
+  left: 39px;
+  right: calc(var(--ux4g-inline-s) * -1 + 8px);
+  top: 13.5px;
+  height: 4px;
+  background-color: var(--ux4g-bg-neutral-subtle);
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-done:not(:last-child):after {
+  background-color: var(--ux4g-bg-primary-strong) !important;
+}
+
+.ux4g-stepper .ux4g-stepper-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ux4g-inline-s);
+}
+
+.ux4g-stepper .ux4g-stepper-head-icon {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  width: 1.938rem;
+  height: 1.938rem;
+  border-radius: 9999px;
+  border: 2px solid var(--ux4g-bg-neutral-subtle);
+  color: var(--ux4g-color-neutral-300);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: transparent;
+}
+
+.ux4g-stepper .ux4g-stepper-label {
+  color: var(--ux4g-text-neutral-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ux4g-stepper .ux4g-stepper-description {
+  color: var(--ux4g-text-neutral-tertiary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1rem;
+}
+
+.ux4g-stepper .ux4g-stepper-content {
+  padding-top: 0.25rem;
+}
+
+.ux4g-stepper .ux4g-stepper-content p {
+  font-size: 0.75rem;
+  color: var(--ux4g-text-neutral-tertiary);
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-completed .ux4g-stepper-head-icon {
+  border-color: var(--ux4g-border-color-primary-strong);
+  color: var(--ux4g-text-brand-primary-default);
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-completed .ux4g-stepper-label {
+  color: var(--ux4g-text-brand-primary-default);
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-done .ux4g-stepper-head-icon {
+  background-color: var(--ux4g-bg-primary-strong);
+  border-color: var(--ux4g-bg-primary-strong);
+  color: white;
+  font-size: 0;
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-done .ux4g-stepper-head-icon::after {
+  content: "✓";
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.ux4g-stepper .ux4g-stepper-step.ux4g-stepper-done .ux4g-stepper-label {
+  color: var(--ux4g-text-status-success);
+}
