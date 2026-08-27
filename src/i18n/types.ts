@@ -33,6 +33,10 @@ export type AppMessages = {
     toLight: string;
     toDark: string;
   };
+  privacy: {
+    show: string;
+    hide: string;
+  };
   status: {
     action_required: string;
     important: string;

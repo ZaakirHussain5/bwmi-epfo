@@ -35,6 +35,10 @@ export const kn: AppMessages = {
     toLight: "ಲೈಟ್ ಮೋಡ್‌ಗೆ ಹೋಗಿ",
     toDark: "ಡಾರ್ಕ್ ಮೋಡ್‌ಗೆ ಹೋಗಿ",
   },
+  privacy: {
+    show: "ಸೂಕ್ಷ್ಮ ಮೊತ್ತಗಳನ್ನು ತೋರಿಸಿ",
+    hide: "ಸೂಕ್ಷ್ಮ ಮೊತ್ತಗಳನ್ನು ಮರೆಮಾಡಿ",
+  },
   status: {
     action_required: "ಕ್ರಮ ಬೇಕು",
     important: "ಮುಖ್ಯ",

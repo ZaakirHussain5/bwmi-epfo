@@ -26,6 +26,7 @@ import { claimStageLabel } from "@/features/claims/utils";
 import { interpolate } from "@/i18n/config";
 import { useLocale } from "@/i18n/useLocale";
 import { formatCurrency, formatDateTime, formatMonthLabel, formatRelativeTime } from "@/lib/utils/format";
+import { usePrivacyMode } from "@/hooks/usePrivacyMode";
 import type {
   AccountHealthCheck,
   AccountHealthReport,
@@ -220,6 +221,7 @@ export function DashboardWorkspace({
   serviceStatus: ServiceStatus[];
 }) {
   const { locale, t } = useLocale();
+  const { hidden: hideSensitiveValues } = usePrivacyMode();
   const activeClaim = claims.find((claim) => claim.status === "active");
   const unresolvedIssue = accountHealth.primaryIssue;
   const blockedChecks = accountHealth.checks.filter((check) => check.status !== "ok");
@@ -346,23 +348,23 @@ export function DashboardWorkspace({
           <div className="grid grid-cols-1 gap-x-6 gap-y-4 border-t border-zinc-200/70 pt-5 min-[480px]:grid-cols-2 @4xl:grid-cols-4 dark:border-zinc-800">
             <Metric
               label={t.dashboard.epfBalance}
-              value={formatCurrency(summary.totalBalance, locale)}
+              value={formatCurrency(summary.totalBalance, locale, hideSensitiveValues)}
               hint={interpolate(t.dashboard.asOn, { month: formatMonthLabel(summary.recentContributionMonth, locale) })}
               valueClassName="text-2xl text-zinc-900 sm:text-3xl dark:text-zinc-100"
             />
             <Metric
               label={t.dashboard.employeeContribution}
-              value={formatCurrency(summary.employeeContributionTotal, locale)}
+              value={formatCurrency(summary.employeeContributionTotal, locale, hideSensitiveValues)}
               valueClassName="text-emerald-600 dark:text-emerald-300"
             />
             <Metric
               label={t.dashboard.employerContribution}
-              value={formatCurrency(summary.employerContributionTotal, locale)}
+              value={formatCurrency(summary.employerContributionTotal, locale, hideSensitiveValues)}
               valueClassName="text-sky-600 dark:text-sky-300"
             />
             <Metric
               label={t.dashboard.epsBalance}
-              value={formatCurrency(summary.epsContributionTotal, locale)}
+              value={formatCurrency(summary.epsContributionTotal, locale, hideSensitiveValues)}
               valueClassName="text-fuchsia-600 dark:text-fuchsia-300"
             />
           </div>

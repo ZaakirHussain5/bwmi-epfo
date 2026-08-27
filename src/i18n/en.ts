@@ -35,6 +35,10 @@ export const en: AppMessages = {
     toLight: "Switch to light mode",
     toDark: "Switch to dark mode",
   },
+  privacy: {
+    show: "Show sensitive values",
+    hide: "Hide sensitive values",
+  },
   status: {
     action_required: "Action required",
     important: "Important",
