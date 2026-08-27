@@ -28,6 +28,29 @@ interface AssistantStatus {
   voiceEnabled: boolean;
 }
 
+interface SpeechRecognitionResultLike {
+  isFinal: boolean;
+  0: { transcript: string };
+}
+
+interface SpeechRecognitionEventLike extends Event {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
 function getPathSuggestions(
   pathname: string,
   t: ReturnType<typeof useLocale>["t"],
@@ -129,7 +152,10 @@ export function AssistantPanel({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const voiceBaseInputRef = useRef("");
+  const finalTranscriptRef = useRef("");
 
   const [status, setStatus] = useState<AssistantStatus | null>(null);
   const [messages, setMessages] = useState<PanelMessage[]>([
@@ -142,6 +168,9 @@ export function AssistantPanel({
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState("");
+  const [draftSource, setDraftSource] = useState<"text" | "voice">("text");
   const [error, setError] = useState("");
   const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | undefined>();
   const [profile, setProfile] = useState<MemberProfile | null>(null);
@@ -222,6 +251,8 @@ export function AssistantPanel({
       const nextMessages = [...messages, userMessage];
       setMessages(nextMessages);
       setInput("");
+      setDraftSource("text");
+      setVoiceStatus("");
       setBusy(true);
       setError("");
 
@@ -366,11 +397,61 @@ export function AssistantPanel({
 
   const startRecording = async () => {
     setError("");
+    setVoiceStatus("");
     if (!status?.voiceEnabled) {
       setError(t.assistant.failure);
       return;
     }
     try {
+      const speechWindow = window as typeof window & {
+        SpeechRecognition?: SpeechRecognitionConstructor;
+        webkitSpeechRecognition?: SpeechRecognitionConstructor;
+      };
+      const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+      if (Recognition) {
+        const recognition = new Recognition();
+        voiceBaseInputRef.current = input.trim();
+        finalTranscriptRef.current = "";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = locale === "hi" ? "hi-IN" : locale === "kn" ? "kn-IN" : "en-IN";
+        recognition.onresult = (event) => {
+          let interimTranscript = "";
+          for (let index = event.resultIndex; index < event.results.length; index += 1) {
+            const result = event.results[index];
+            const transcript = result[0]?.transcript ?? "";
+            if (result.isFinal) {
+              finalTranscriptRef.current += `${transcript} `;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          const nextDraft = [
+            voiceBaseInputRef.current,
+            finalTranscriptRef.current.trim(),
+            interimTranscript.trim(),
+          ].filter(Boolean).join(" ");
+          setInput(nextDraft);
+          setDraftSource("voice");
+        };
+        recognition.onerror = () => {
+          setError(t.assistant.failure);
+          setRecording(false);
+        };
+        recognition.onend = () => {
+          speechRecognitionRef.current = null;
+          setRecording(false);
+          setVoiceStatus(t.assistant.voiceDraftReady);
+          inputRef.current?.focus();
+        };
+        speechRecognitionRef.current = recognition;
+        recognition.start();
+        setRecording(true);
+        setVoiceStatus(t.assistant.listening);
+        return;
+      }
+
+      setVoiceStatus(t.assistant.voiceNotSupported);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       chunksRef.current = [];
@@ -384,18 +465,23 @@ export function AssistantPanel({
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
         const form = new FormData();
         form.append("audio", blob, "voice.webm");
-        setBusy(true);
+        setTranscribing(true);
+        setVoiceStatus(t.assistant.transcribing);
         try {
           const response = await fetch("/api/assistant/transcribe", { method: "POST", body: form });
           const data = (await response.json()) as { text?: string; error?: string };
           if (!response.ok || !data.text) {
             throw new Error("assistant_transcription_failed");
           }
-          await sendChat(data.text, "voice");
+          setInput((current) => [current.trim(), data.text?.trim()].filter(Boolean).join(" "));
+          setDraftSource("voice");
+          setVoiceStatus(t.assistant.voiceDraftReady);
+          inputRef.current?.focus();
         } catch (voiceError) {
           console.error(voiceError);
           setError(t.assistant.failure);
-          setBusy(false);
+        } finally {
+          setTranscribing(false);
         }
       };
       mediaRecorderRef.current = recorder;
@@ -408,6 +494,10 @@ export function AssistantPanel({
   };
 
   const stopRecording = () => {
+    if (speechRecognitionRef.current) {
+      speechRecognitionRef.current.stop();
+      return;
+    }
     mediaRecorderRef.current?.stop();
     setRecording(false);
   };
@@ -567,7 +657,7 @@ export function AssistantPanel({
           className="rounded-3xl border border-zinc-300 bg-white p-3 shadow-[0_2px_12px_rgba(15,23,42,0.08)] dark:border-zinc-700 dark:bg-zinc-900"
           onSubmit={(event) => {
             event.preventDefault();
-            void sendChat(input);
+            void sendChat(input, draftSource);
           }}
         >
           <label className="sr-only" htmlFor="nidhi-chat-input">
@@ -578,17 +668,19 @@ export function AssistantPanel({
             ref={inputRef}
             rows={3}
             value={input}
-            disabled={busy}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void sendChat(input);
-              }
+            disabled={busy || transcribing}
+            onChange={(event) => {
+              setInput(event.target.value);
+              if (!recording) setDraftSource("text");
             }}
             placeholder={t.assistant.placeholder}
             className="min-h-[5.8rem] w-full resize-none border-none bg-transparent px-2 py-1 text-[1.03rem] leading-8 text-zinc-800 placeholder:text-zinc-400 focus:outline-none dark:text-zinc-100 dark:placeholder:text-zinc-500"
           />
+          {voiceStatus ? (
+            <p className="px-2 pt-1 text-xs font-medium text-teal-700 dark:text-teal-300" aria-live="polite">
+              {voiceStatus}
+            </p>
+          ) : null}
           <div className="mt-2 flex items-center justify-end gap-2">
             <button
               type="button"
@@ -602,14 +694,14 @@ export function AssistantPanel({
               aria-pressed={recording}
               aria-label={recording ? t.assistant.stopVoice : t.assistant.startVoice}
               title={t.assistant.voiceTitle}
-              disabled={busy && !recording}
+              disabled={(busy || transcribing) && !recording}
             >
               {recording ? "■" : "🎤"}
             </button>
             <button
               type="submit"
               className="grid h-10 w-10 place-items-center rounded-full bg-zinc-200 text-zinc-600 transition hover:bg-zinc-300 disabled:opacity-60 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
-              disabled={busy || !input.trim()}
+              disabled={busy || transcribing || recording || !input.trim()}
               aria-label={t.assistant.send}
             >
               ↑

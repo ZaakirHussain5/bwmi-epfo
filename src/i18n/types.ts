@@ -492,6 +492,10 @@ export type AppMessages = {
     startVoice: string;
     stopVoice: string;
     voiceTitle: string;
+    listening: string;
+    transcribing: string;
+    voiceDraftReady: string;
+    voiceNotSupported: string;
     send: string;
     sensitive: string;
     failure: string;
