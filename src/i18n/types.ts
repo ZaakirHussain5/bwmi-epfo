@@ -95,6 +95,10 @@ export type AppMessages = {
     changeUan: string;
     enterUan: string;
     continue: string;
+    continuing: string;
+    verifyingOtp: string;
+    openingDashboard: string;
+    openingPortal: string;
     backHome: string;
   };
   dashboard: {

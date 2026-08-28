@@ -97,6 +97,10 @@ export const hi: AppMessages = {
     changeUan: "UAN बदलें",
     enterUan: "UAN दर्ज करें",
     continue: "जारी रखें",
+    continuing: "जारी है…",
+    verifyingOtp: "OTP सत्यापित हो रहा है…",
+    openingDashboard: "डैशबोर्ड खुल रहा है…",
+    openingPortal: "पोर्टल खुल रहा है…",
     backHome: "होम पर वापस",
   },
   dashboard: {

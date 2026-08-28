@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function OtpCodeInput({
   id,
@@ -8,12 +8,16 @@ export function OtpCodeInput({
   defaultValue = "",
   length = 6,
   required = true,
+  disabled = false,
+  onComplete,
 }: {
   id: string;
   name: string;
   defaultValue?: string;
   length?: number;
   required?: boolean;
+  disabled?: boolean;
+  onComplete?: (value: string) => void;
 }) {
   const initialDigits = useMemo(
     () =>
@@ -84,6 +88,21 @@ export function OtpCodeInput({
   };
 
   const otpValue = digits.join("");
+  const submittedRef = useRef(false);
+
+  useEffect(() => {
+    if (disabled) {
+      return;
+    }
+    if (otpValue.length === length && !submittedRef.current) {
+      submittedRef.current = true;
+      onComplete?.(otpValue);
+      return;
+    }
+    if (otpValue.length !== length) {
+      submittedRef.current = false;
+    }
+  }, [disabled, length, onComplete, otpValue]);
 
   return (
     <div>
@@ -99,11 +118,12 @@ export function OtpCodeInput({
             inputMode="numeric"
             pattern="[0-9]*"
             autoComplete={index === 0 ? "one-time-code" : "off"}
-            autoFocus={index === 0}
+            autoFocus={index === 0 && !disabled}
             value={digit}
             maxLength={1}
+            disabled={disabled}
             aria-label={`OTP digit ${index + 1}`}
-            className="h-12 w-full rounded-lg border border-zinc-300 bg-white text-center text-lg font-semibold text-zinc-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400 dark:focus:ring-teal-900/40"
+            className="h-12 w-full rounded-lg border border-zinc-300 bg-white text-center text-lg font-semibold text-zinc-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200 disabled:cursor-wait disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400 dark:focus:ring-teal-900/40"
             onChange={(event) => setDigit(index, event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Backspace") {

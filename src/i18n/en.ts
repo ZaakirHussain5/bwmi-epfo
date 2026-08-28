@@ -98,6 +98,10 @@ export const en: AppMessages = {
     changeUan: "Change UAN",
     enterUan: "Enter UAN",
     continue: "Continue",
+    continuing: "Continuing…",
+    verifyingOtp: "Verifying OTP…",
+    openingDashboard: "Opening dashboard…",
+    openingPortal: "Opening portal…",
     backHome: "Back to home",
   },
   dashboard: {

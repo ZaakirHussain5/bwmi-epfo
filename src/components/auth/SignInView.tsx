@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 import { startMemberSignIn, verifyMemberOtp } from "@/actions/auth";
 import { OtpCodeInput } from "@/components/auth/OtpCodeInput";
+import { BusyOverlay } from "@/components/common/BusyOverlay";
+import { IconSpinner } from "@/components/common/icons";
 import { NidhiMark } from "@/components/layout/NidhiLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
@@ -27,14 +30,35 @@ export function SignInView({
   selectedMember,
 }: SignInViewProps) {
   const { t } = useLocale();
+  const pendingRef = useRef(false);
+  const otpFormRef = useRef<HTMLFormElement>(null);
+  const [pendingLabel, setPendingLabel] = useState<string | null>(null);
+  const pending = pendingLabel !== null;
+
+  const submitOtpForm = useCallback(() => {
+    otpFormRef.current?.requestSubmit();
+  }, []);
+
+  const beginPending = (label: string) => (event: FormEvent<HTMLFormElement>) => {
+    if (pendingRef.current) {
+      event.preventDefault();
+      return;
+    }
+    pendingRef.current = true;
+    setPendingLabel(label);
+  };
 
   return (
     <div className="grid min-h-screen place-items-center bg-zinc-100 px-4 py-10 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <div className="absolute right-4 top-4 flex items-center gap-2">
+      <div className="absolute right-4 top-4 flex items-center gap-2" inert={pending ? true : undefined}>
         <LanguageSwitcher />
         <ThemeToggle />
       </div>
-      <main className="w-full max-w-md space-y-6 rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-white/10">
+      <main
+        className="w-full max-w-md space-y-6 rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-white/10"
+        aria-busy={pending}
+        inert={pending ? true : undefined}
+      >
         <div>
           <div className="mb-3 inline-flex items-center gap-3">
             <NidhiMark className="h-12 w-12" />
@@ -72,11 +96,13 @@ export function SignInView({
             </p>
             <div className="grid max-h-64 gap-2 overflow-y-auto pr-1">
               {accounts.map((account) => (
-                <form action={startMemberSignIn} key={account.uan}>
+                <form action={startMemberSignIn} key={account.uan} onSubmit={beginPending(t.auth.continuing)}>
                   <input type="hidden" name="uan" value={account.uan} />
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-zinc-100 px-4 py-3 text-left text-sm text-zinc-800 transition hover:bg-zinc-200 hover:ring-1 hover:ring-teal-500/40 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:ring-teal-400/40"
+                    disabled={pending}
+                    aria-busy={pending}
+                    className="w-full rounded-xl bg-zinc-100 px-4 py-3 text-left text-sm text-zinc-800 transition hover:bg-zinc-200 hover:ring-1 hover:ring-teal-500/40 disabled:cursor-wait disabled:opacity-70 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:hover:ring-teal-400/40"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -115,27 +141,32 @@ export function SignInView({
         ) : null}
 
         {otpStep && selectedMember ? (
-          <form action={verifyMemberOtp}>
+          <form ref={otpFormRef} action={verifyMemberOtp} onSubmit={beginPending(t.auth.verifyingOtp)}>
             <input type="hidden" name="uan" value={selectedMember.uan} />
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200" htmlFor="otp-input">
               {t.common.otp}
             </label>
-            <OtpCodeInput id="otp-input" name="otp" defaultValue="" />
-            <button
-              type="submit"
-              className="mt-4 w-full rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-teal-400"
-            >
-              {t.auth.verifyEnter}
-            </button>
-            <Link
-              href="/sign-in"
-              className="mt-3 block text-center text-sm text-zinc-500 transition hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-            >
-              {t.auth.changeUan}
-            </Link>
+            <OtpCodeInput
+              id="otp-input"
+              name="otp"
+              defaultValue=""
+              disabled={pending}
+              onComplete={submitOtpForm}
+            />
+            <SubmitButton idleLabel={t.auth.verifyEnter} pendingLabel={t.auth.verifyingOtp} pending={pending} />
+            {pending ? (
+              <span className="mt-3 block text-center text-sm text-zinc-400 dark:text-zinc-500">{t.auth.changeUan}</span>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="mt-3 block text-center text-sm text-zinc-500 transition hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+              >
+                {t.auth.changeUan}
+              </Link>
+            )}
           </form>
         ) : (
-          <form action={startMemberSignIn}>
+          <form action={startMemberSignIn} onSubmit={beginPending(t.auth.continuing)}>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200" htmlFor="uan-input">
               {t.common.uan}
             </label>
@@ -145,14 +176,11 @@ export function SignInView({
               required
               autoComplete="username"
               placeholder={t.auth.enterUan}
-              className="mt-1 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-teal-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400"
+              readOnly={pending}
+              aria-busy={pending}
+              className="mt-1 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-teal-500 read-only:cursor-wait dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400"
             />
-            <button
-              type="submit"
-              className="mt-4 w-full rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-teal-400"
-            >
-              {t.auth.continue}
-            </button>
+            <SubmitButton idleLabel={t.auth.continue} pendingLabel={t.auth.continuing} pending={pending} />
           </form>
         )}
 
@@ -163,6 +191,29 @@ export function SignInView({
           {t.auth.backHome}
         </Link>
       </main>
+      {pendingLabel ? <BusyOverlay label={pendingLabel} /> : null}
     </div>
+  );
+}
+
+function SubmitButton({
+  idleLabel,
+  pendingLabel,
+  pending,
+}: {
+  idleLabel: string;
+  pendingLabel: string;
+  pending: boolean;
+}) {
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-busy={pending}
+      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-teal-400 disabled:cursor-wait disabled:opacity-80"
+    >
+      {pending ? <IconSpinner className="h-4 w-4" /> : null}
+      {pending ? pendingLabel : idleLabel}
+    </button>
   );
 }

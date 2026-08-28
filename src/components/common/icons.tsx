@@ -227,3 +227,11 @@ export function IconRobot(props: IconProps) {
     </LineIcon>
   );
 }
+
+export function IconSpinner({ className = "h-5 w-5", ...props }: IconProps) {
+  return (
+    <LineIcon className={`animate-spin ${className}`} {...props}>
+      <path d="M21 12a9 9 0 1 1-6.22-8.56" />
+    </LineIcon>
+  );
+}

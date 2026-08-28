@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { BusyOverlay } from "@/components/common/BusyOverlay";
+import { IconSpinner } from "@/components/common/icons";
 import { HeroScene } from "@/components/landing/HeroScene";
 import {
   FEATURE_ILLUSTRATIONS,
@@ -17,22 +20,42 @@ type LandingPageProps = {
 };
 
 export function LandingPage({ signedIn }: LandingPageProps) {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const copy = landingCopy[locale];
   const enterHref = signedIn ? "/dashboard" : "/sign-in";
   const enterLabel = signedIn ? copy.nav.openDashboard : copy.nav.enter;
   const heroCta = signedIn ? copy.hero.signedInCta : copy.hero.cta;
+  const pendingLabel = signedIn ? t.auth.openingDashboard : t.auth.openingPortal;
+  const pendingRef = useRef(false);
+  const [portalPending, setPortalPending] = useState(false);
+
+  const handlePortalNavigate = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+      return;
+    }
+    if (pendingRef.current) {
+      event.preventDefault();
+      return;
+    }
+    pendingRef.current = true;
+    setPortalPending(true);
+  };
 
   return (
-    <div className="landing-root landing-mesh min-h-full overflow-x-hidden" data-landing-lang={locale}>
-      <a
-        href="#features"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-teal-700 focus:px-3 focus:py-2 focus:text-white"
-      >
-        {copy.skip}
-      </a>
+    <div
+      className="landing-root landing-mesh min-h-full overflow-x-hidden"
+      data-landing-lang={locale}
+      aria-busy={portalPending}
+    >
+      <div inert={portalPending ? true : undefined}>
+        <a
+          href="#features"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-teal-700 focus:px-3 focus:py-2 focus:text-white"
+        >
+          {copy.skip}
+        </a>
 
-      <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-950/75">
+        <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-950/75">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 md:px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <NidhiMark className="h-10 w-10" />
@@ -54,12 +77,15 @@ export function LandingPage({ signedIn }: LandingPageProps) {
           <div className="ml-auto flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
-            <Link
+            <PortalEnterLink
               href={enterHref}
-              className="hidden rounded-xl bg-teal-700 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 sm:inline-flex dark:bg-teal-600 dark:hover:bg-teal-500"
+              busy={portalPending}
+              busyLabel={pendingLabel}
+              onNavigate={handlePortalNavigate}
+              className="hidden items-center gap-2 rounded-xl bg-teal-700 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 sm:inline-flex dark:bg-teal-600 dark:hover:bg-teal-500"
             >
               {enterLabel}
-            </Link>
+            </PortalEnterLink>
           </div>
         </div>
       </header>
@@ -77,12 +103,15 @@ export function LandingPage({ signedIn }: LandingPageProps) {
               {copy.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
+              <PortalEnterLink
                 href={enterHref}
-                className="rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
+                busy={portalPending}
+                busyLabel={pendingLabel}
+                onNavigate={handlePortalNavigate}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
               >
                 {heroCta}
-              </Link>
+              </PortalEnterLink>
               <a
                 href="#features"
                 className="rounded-2xl border border-zinc-300 bg-white/80 px-5 py-3 text-sm font-semibold text-zinc-800 transition hover:border-teal-400 dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-100"
@@ -219,12 +248,15 @@ export function LandingPage({ signedIn }: LandingPageProps) {
             </svg>
             <h2 className="relative text-3xl font-semibold tracking-tight md:text-4xl">{copy.cta.title}</h2>
             <p className="relative mx-auto mt-4 max-w-2xl text-sm leading-6 text-teal-50/90">{copy.cta.body}</p>
-            <Link
+            <PortalEnterLink
               href={enterHref}
-              className="relative mt-8 inline-flex rounded-2xl bg-amber-300 px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-amber-200"
+              busy={portalPending}
+              busyLabel={pendingLabel}
+              onNavigate={handlePortalNavigate}
+              className="relative mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-300 px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-amber-200"
             >
               {signedIn ? copy.cta.signedInButton : copy.cta.button}
-            </Link>
+            </PortalEnterLink>
           </div>
         </section>
       </main>
@@ -239,11 +271,50 @@ export function LandingPage({ signedIn }: LandingPageProps) {
           <nav className="flex gap-4 text-xs" aria-label="Footer">
             <a href="#privacy">{copy.footer.privacy}</a>
             <a href="#terms">{copy.footer.terms}</a>
-            <Link href={enterHref}>{enterLabel}</Link>
+            <PortalEnterLink
+              href={enterHref}
+              busy={portalPending}
+              busyLabel={pendingLabel}
+              onNavigate={handlePortalNavigate}
+              className="inline-flex items-center gap-1.5 transition hover:text-teal-700 dark:hover:text-teal-300"
+            >
+              {enterLabel}
+            </PortalEnterLink>
           </nav>
         </div>
       </footer>
+      </div>
+      {portalPending ? <BusyOverlay label={pendingLabel} /> : null}
     </div>
+  );
+}
+
+function PortalEnterLink({
+  href,
+  className,
+  children,
+  busy,
+  busyLabel,
+  onNavigate,
+}: {
+  href: string;
+  className: string;
+  children: ReactNode;
+  busy: boolean;
+  busyLabel: string;
+  onNavigate: (event: MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`${busy ? "pointer-events-none cursor-wait" : ""} ${className}`.trim()}
+      aria-busy={busy}
+      aria-disabled={busy}
+      onClick={onNavigate}
+    >
+      {busy ? <IconSpinner className="h-4 w-4" /> : null}
+      {busy ? busyLabel : children}
+    </Link>
   );
 }
 

@@ -97,6 +97,10 @@ export const kn: AppMessages = {
     changeUan: "UAN ಬದಲಿಸಿ",
     enterUan: "UAN ನಮೂದಿಸಿ",
     continue: "ಮುಂದುವರಿಸಿ",
+    continuing: "ಮುಂದುವರಿಯುತ್ತಿದೆ…",
+    verifyingOtp: "OTP ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…",
+    openingDashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ…",
+    openingPortal: "ಪೋರ್ಟಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ…",
     backHome: "ಹೋಮ್‌ಗೆ ಹಿಂತಿರುಗಿ",
   },
   dashboard: {
