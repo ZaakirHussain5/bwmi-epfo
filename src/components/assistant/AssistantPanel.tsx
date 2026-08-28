@@ -441,7 +441,7 @@ export function AssistantPanel({
         recognition.onend = () => {
           speechRecognitionRef.current = null;
           setRecording(false);
-          setVoiceStatus(t.assistant.voiceDraftReady);
+          setVoiceStatus("");
           inputRef.current?.focus();
         };
         speechRecognitionRef.current = recognition;
@@ -475,7 +475,7 @@ export function AssistantPanel({
           }
           setInput((current) => [current.trim(), data.text?.trim()].filter(Boolean).join(" "));
           setDraftSource("voice");
-          setVoiceStatus(t.assistant.voiceDraftReady);
+          setVoiceStatus("");
           inputRef.current?.focus();
         } catch (voiceError) {
           console.error(voiceError);
